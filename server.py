@@ -42,12 +42,14 @@ def tuple_list(tuple_key):
 
 def tcplink(sock, addr):
     print('Accept new connection from %s:%s...' % addr)
-    sock.send(b'Welcome! connect server successful!')
+    sock.send(base_msg_encode('Welcome! connect server successful!'))
     time.sleep(1)
     key = sock.recv(1024)
     name ,passwd = tuple_list(tuple(base_msg_decode(key)))
     key_home(name ,passwd)
-    msg_out(name ,passwd)
+    t_in = threading.Thread(target=tcplink_in ,args=(name ,passwd ,sock))
+    t_in.start()
+    msg_out(name ,passwd ,sock)
     # while True:
     #     data = sock.recv(1024)
     #     time.sleep(1)
@@ -61,7 +63,40 @@ def tcplink(sock, addr):
     print('Connection from %s:%s closed.' % addr)
 
 
-def msg_out(name ,passwd):
+def msg_out(name ,passwd ,sock):
+    # menu = '''
+    #         menu:
+    #         exit : 退出聊天室
+    #         show : 显示当前聊天室在线人数
+    #         lrs  ：启动狼人杀(完善中)
+    #         xg   ：连接到雪糕(完善中)
+    #         '''
+    # while True:
+    #     msg = base_msg_decode(sock.recv(1024))
+    #     time.sleep(1)
+    #     if not msg or msg == 'exit':
+    #         break
+    #     elif msg == 'menu':
+    #         sock.send(base_msg_encode(menu))
+    #     elif msg == 'lrs':
+    #         pass
+    #     elif msg == 'xg':
+    #         pass
+    #     elif msg == 'show':
+    #         global dict_key
+    #         sock.send(base_msg_encode(dict_key[passwd]))
+    #     msg_num = -1
+    #     global dict_msg
+    #     dict_msg[passwd].append((name ,msg))
+        for i in dict_msg[passwd]:
+            msg_num = msg_num + 1
+            if msg_num != len(dict_msg[passwd]):
+                if i[0] != name:
+                    sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
+
+
+
+def tcplink_in(name ,passwd ,sock):
     menu = '''
             menu:
             exit : 退出聊天室
@@ -71,7 +106,7 @@ def msg_out(name ,passwd):
             '''
     while True:
         msg = base_msg_decode(sock.recv(1024))
-        time.sleep(2)
+        time.sleep(1)
         if not msg or msg == 'exit':
             break
         elif msg == 'menu':
@@ -86,12 +121,6 @@ def msg_out(name ,passwd):
         msg_num = -1
         global dict_msg
         dict_msg[passwd].append((name ,msg))
-        for i in dict_msg[passwd]:
-            msg_num = msg_num + 1
-            if msg_num != len(dict_msg[passwd]):
-                if i[0] != name:
-                    sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
-
 
 
 def base_msg_encode(msg):
@@ -115,8 +144,8 @@ if __name__ == "__main__":
         # 接受一个新连接:
         sock, addr = s.accept()
         # 创建新线程来处理TCP连接:
-        t = threading.Thread(target=tcplink, args=(sock, addr))
-        t.start()
+        t_link = threading.Thread(target=tcplink, args=(sock, addr))
+        t_link.start()
         for i in dict_key:
             if dict_key[i] == []:
                 dict_key.pop(dict_key[i])

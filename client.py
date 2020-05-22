@@ -3,6 +3,7 @@ import base64
 import hashlib
 import sys
 import time
+import threading
 from progressbar import *
 
 """
@@ -13,7 +14,7 @@ from progressbar import *
 
 
 #全局变量
-# worning_level0 = 0
+worning_level0 = 0
 worning_level1 = 0
 # worning_level2 = 0
 
@@ -72,22 +73,50 @@ def login():
             sys.exit(1)
 
 
+def out_msg():
+    global s
+    while True:
+        time.sleep(1)
+        print(base_msg_decode(s.recv(1024)))
+        if worning_level0 == 1:
+            break
+
+
+def in_msg():
+    global s
+    while True:
+        msg=input(">>>")
+        # 发送数据:
+        s.send(base_msg_encode(msg))
+        if msg =='exit':
+            global worning_level0
+            worning_level0 = 1
+            break
+
+
+
 if __name__ == "__main__":
     key = login()
     print(key)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 建立连接:
     s.connect(('119.3.219.105', 3389))
-    # 接收欢迎消息:
-    print(s.recv(1024).decode('utf-8'))
+    #接受连接信息
+    print(base_msg_decode(s.recv(1024)))
+    # 发送密钥和用户名
     s.send(base_msg_encode(str(key)))
     prog()
-    while True:
-        msg=input(">>>")
-        # 发送数据:
-        s.send(base_msg_encode(msg))
-        print(base_msg_decode(s.recv(1024)))
-        if msg =='exit':
-            break
+    t_in = threading.Thread(target=in_msg)
+    t_out = threading.Thread(target=out_msg)
+    t_out.start()
+    t_in.start()
+    # while True:
+    #     msg=input(">>>")
+    #     # 发送数据:
+    #     s.send(base_msg_encode(msg))
+    #     print(base_msg_decode(s.recv(1024)))
+    #     if msg =='exit':
+    #         break
     s.send(base_msg_encode('exit'))
     s.close()
+
