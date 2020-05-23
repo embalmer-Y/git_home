@@ -48,6 +48,7 @@ def tcplink(sock, addr):
     name ,passwd = tuple_list(tuple(base_msg_decode(key)))
     key_home(name ,passwd)
     t_in = threading.Thread(target=tcplink_in ,args=(name ,passwd ,sock))
+    time.sleep(1)
     t_in.start()
     msg_out(name ,passwd ,sock)
     # while True:
@@ -59,7 +60,7 @@ def tcplink(sock, addr):
     #     sock.send(('Server:%s'% input()).encode('utf-8'))
     sock.close()
     global dict_key
-    dict_key[passwd].pop(name)
+    dict_key[passwd].remove(name)
     print('Connection from %s:%s closed.' % addr)
 
 
@@ -85,14 +86,18 @@ def msg_out(name ,passwd ,sock):
     #     elif msg == 'show':
     #         global dict_key
     #         sock.send(base_msg_encode(dict_key[passwd]))
-    #     msg_num = -1
-    #     global dict_msg
-    #     dict_msg[passwd].append((name ,msg))
+    msg_num = -1
+#     global dict_msg
+#     dict_msg[passwd].append((name ,msg))
+    while True:
         for i in dict_msg[passwd]:
             msg_num = msg_num + 1
-            if msg_num != len(dict_msg[passwd]):
-                if i[0] != name:
-                    sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
+            if dict_msg == []:
+                pass
+            else:
+                if msg_num != len(dict_msg[passwd]):
+                    if i[0] != name:
+                        sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
 
 
 
@@ -118,7 +123,6 @@ def tcplink_in(name ,passwd ,sock):
         elif msg == 'show':
             global dict_key
             sock.send(base_msg_encode(dict_key[passwd]))
-        msg_num = -1
         global dict_msg
         dict_msg[passwd].append((name ,msg))
 

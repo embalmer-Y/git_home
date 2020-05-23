@@ -76,8 +76,12 @@ def login():
 def out_msg():
     global s
     while True:
+        one_msg = base_msg_decode(s.recv(1024))
+        two_msg = ''
         time.sleep(1)
-        print(base_msg_decode(s.recv(1024)))
+        if one_msg != two_msg:
+            print(one_msg)
+            two_msg = one_msg
         if worning_level0 == 1:
             break
 
