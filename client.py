@@ -14,7 +14,7 @@ from progressbar import *
 
 
 #全局变量
-worning_level0 = 0
+# worning_level0 = 0
 worning_level1 = 0
 # worning_level2 = 0
 
@@ -73,29 +73,25 @@ def login():
             sys.exit(1)
 
 
-def out_msg():
-    global s
-    while True:
-        one_msg = base_msg_decode(s.recv(1024))
-        two_msg = ''
-        time.sleep(1)
-        if one_msg != two_msg:
-            print(one_msg)
-            two_msg = one_msg
-        if worning_level0 == 1:
-            break
+# def out_msg():
+#     global s
+#     while True:
+#         time.sleep(1)
+#         print(base_msg_decode(s.recv(1024)))
+#         if worning_level0 == 1:
+#             break
 
 
-def in_msg():
-    global s
-    while True:
-        msg=input(">>>")
-        # 发送数据:
-        s.send(base_msg_encode(msg))
-        if msg =='exit':
-            global worning_level0
-            worning_level0 = 1
-            break
+# def in_msg():
+#     global s
+#     while True:
+#         msg=input(">>>")
+#         # 发送数据:
+#         s.send(base_msg_encode(msg))
+#         if msg =='exit':
+#             global worning_level0
+#             worning_level0 = 1
+#             break
 
 
 
@@ -110,17 +106,13 @@ if __name__ == "__main__":
     # 发送密钥和用户名
     s.send(base_msg_encode(str(key)))
     prog()
-    t_in = threading.Thread(target=in_msg)
-    t_out = threading.Thread(target=out_msg)
-    t_out.start()
-    t_in.start()
-    # while True:
-    #     msg=input(">>>")
-    #     # 发送数据:
-    #     s.send(base_msg_encode(msg))
-    #     print(base_msg_decode(s.recv(1024)))
-    #     if msg =='exit':
-    #         break
+    while True:
+        msg=input(">>>")
+        # 发送数据:
+        s.send(base_msg_encode(msg))
+        print(base_msg_decode(s.recv(1024)))
+        if msg =='exit':
+            break
     s.send(base_msg_encode('exit'))
     s.close()
 
