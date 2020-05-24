@@ -18,6 +18,11 @@ dict_key = {}
 
 
 def key_home(name ,passwd):
+    '''
+    对全局变量进行操作：
+    记录聊天内容输入
+    记录聊天室在线成员
+    '''
     global list_key ,list_name ,dict_key ,dict_msg
     list_name.append(name)
     if passwd in list_key:
@@ -29,6 +34,9 @@ def key_home(name ,passwd):
 
 
 def tuple_list(tuple_key):
+    '''
+    对输入昵称-密钥对进行操作使其返回一个列表
+    '''
     str_key = ''
     for i in tuple_key:
         if i == '(' or i == ')' or i == ' ' or i == "'":
@@ -41,6 +49,9 @@ def tuple_list(tuple_key):
 
 
 def tcplink(sock, addr):
+    '''
+    接收密钥及分发连接成功信息
+    '''
     print('Accept new connection from %s:%s...' % addr)
     sock.send(base_msg_encode('Welcome! connect server successful!'))
     time.sleep(1)
@@ -86,18 +97,36 @@ def msg_out(name ,passwd ,sock):
     #     elif msg == 'show':
     #         global dict_key
     #         sock.send(base_msg_encode(dict_key[passwd]))
-    msg_num = -1
-#     global dict_msg
+    msg_num = 0
+    global dict_msg
 #     dict_msg[passwd].append((name ,msg))
     while True:
-        for i in dict_msg[passwd]:
-            msg_num = msg_num + 1
-            if dict_msg == []:
-                pass
+        for i in dict_msg[passwd][msg_num:]:
+
+        #     if dict_msg[passwd] == []:
+        #         pass
+        #     else:
+        #         if msg_num < len(dict_msg[passwd]):
+            if i[0] != name:
+                sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
+                msg_num = msg_num + 1
             else:
-                if msg_num != len(dict_msg[passwd]):
-                    if i[0] != name:
-                        sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
+                msg_num = msg_num + 1
+        #     print(msg_num)
+        # if msg_num < len(dict_msg[passwd]):
+        #     if dict_msg[passwd][msg_num][0] != name:
+        #         sock.send(base_msg_encode(f'{dict_msg[passwd][msg_num][0]}:{dict_msg[passwd][msg_num][1]}'))
+        #         msg_num = msg_num + 1
+        #         print(msg_num)
+            # for i in dict_msg[passwd]:
+            #     # if dict_msg[passwd] == []:
+            #     #     pass
+            #     # else:
+            #         if i[0] != name:
+            #             sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
+            #             msg_num = msg_num + 1
+            #             print(msg_num)
+
 
 
 
@@ -128,18 +157,27 @@ def tcplink_in(name ,passwd ,sock):
 
 
 def base_msg_encode(msg):
+    '''
+    加密聊天内容
+    '''
     msg_utf = msg.encode('UTF-8')
     msg_bas = base64.b64encode(msg_utf)
     return msg_bas
 
 
 def base_msg_decode(msg_bas):
+    '''
+    解密聊天内容
+    '''
     msg_utf = base64.b64decode(msg_bas)
     msg = msg_utf.decode('UTF-8')
     return msg
 
 
 if __name__ == "__main__":
+    '''
+    服务端监听连接并分发新的线程
+    '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', 3389))
     s.listen(10)

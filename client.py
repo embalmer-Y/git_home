@@ -14,7 +14,7 @@ from progressbar import *
 
 
 #全局变量
-# worning_level0 = 0
+worning_level0 = 0
 worning_level1 = 0
 # worning_level2 = 0
 
@@ -40,13 +40,13 @@ def base_msg_encode(msg):
 
 
 def login():
-    print('=============上流聊天软件V0.1=============')
+    print('=============上流聊天软件V1.0=============')
     print('''------------------------------------------
     |               使用说明                 |
     | 想使用该软件请先给自己取一个牛皮的名字 |
     | 1 加入聊天:输入聊天室密钥即可加入聊天  |
     | 2 创建聊天:该选项将生成一个聊天室密钥  |
-    | 0 退出程序:关闭牛皮的上流聊天软件      |
+    |  exit 退出程序:关闭牛皮的上流聊天软件  |
     |    加入聊天后可输入menu查看可选菜单    |
     ------------------------------------------''')
     user_name = input('请输入您牛皮的id:')
@@ -62,14 +62,13 @@ def login():
     elif options == '1':
         passwd = input('请键入上流聊天室密钥')
         return (user_name ,passwd)
+    elif options == 'exit':
+        sys.exit(1)
     else:
         global worning_level1
         worning_level1 = worning_level1 + 1
         if worning_level1 == 1:
             print('再乱输入你就要出大事了')
-        elif worning_level1 == 2:
-            print('老铁,再一再二不再三')
-        elif worning_level1 == 3:
             sys.exit(1)
 
 
@@ -77,7 +76,13 @@ def login():
 #     global s
 #     while True:
 #         time.sleep(1)
-#         print(base_msg_decode(s.recv(1024)))
+#         msg_one = base_msg_decode(s.recv(1024))
+#         msg_two = ''
+#         if msg_one.find(msg_two) == -1:
+#             print(msg_one)
+#             msg_two = msg_one
+#         else:
+#             pass
 #         if worning_level0 == 1:
 #             break
 
@@ -106,6 +111,10 @@ if __name__ == "__main__":
     # 发送密钥和用户名
     s.send(base_msg_encode(str(key)))
     prog()
+    # msg_out = threading.Thread(target=out_msg)
+    # msg_in = threading.Thread(target=in_msg)
+    # msg_out.start()
+    # msg_in.start()
     while True:
         msg=input(">>>")
         # 发送数据:
