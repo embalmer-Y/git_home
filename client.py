@@ -133,7 +133,8 @@ if __name__ == "__main__":
             msg_num = msg_num + 1
         else:
             pass
-        print('\n', base_msg_decode(s.recv(1024)))
+        print(base_msg_decode(s.recv(1024)))
+        print('>>>', end='')
     s.send(base_msg_encode('exit'))
     s.close()
 

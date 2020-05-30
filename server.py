@@ -179,7 +179,7 @@ if __name__ == "__main__":
     服务端监听连接并分发新的线程
     '''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('0.0.0.0', 3389))
+    s.bind(('0.0.0.0', 9999))
     s.listen(10)
     print('Waiting for connection...')
     while True:
