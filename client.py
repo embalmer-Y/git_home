@@ -17,6 +17,7 @@ from progressbar import *
 worning_level0 = 0
 worning_level1 = 0
 # worning_level2 = 0
+list_msg = []
 
 
 def prog():
@@ -73,7 +74,7 @@ def login():
 
 
 # def out_msg():
-#     global s
+#     global list_msg
 #     while True:
 #         time.sleep(1)
 #         msg_one = base_msg_decode(s.recv(1024))
@@ -87,16 +88,23 @@ def login():
 #             break
 
 
-# def in_msg():
-#     global s
-#     while True:
-#         msg=input(">>>")
-#         # 发送数据:
-#         s.send(base_msg_encode(msg))
-#         if msg =='exit':
-#             global worning_level0
-#             worning_level0 = 1
-#             break
+def in_msg():
+    global list_msg ,msg_num
+    while True:
+        msg = input('>>>')
+        list_msg.append(msg)
+        if len(list_msg) == 100:
+            list_msg.clear()
+            msg_num = 0
+
+    # while True:
+    #     msg=input(">>>")
+    #     # 发送数据:
+    #     s.send(base_msg_encode(msg))
+    #     if msg =='exit':
+    #         global worning_level0
+    #         worning_level0 = 1
+    #         break
 
 
 
@@ -104,24 +112,28 @@ if __name__ == "__main__":
     key = login()
     print(key)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # print(type(s))
     # 建立连接:
-    s.connect(('119.3.219.105', 3389))
+    s.connect(('119.3.219.105', 9999))
     #接受连接信息
     print(base_msg_decode(s.recv(1024)))
     # 发送密钥和用户名
     s.send(base_msg_encode(str(key)))
     prog()
-    # msg_out = threading.Thread(target=out_msg)
-    # msg_in = threading.Thread(target=in_msg)
-    # msg_out.start()
-    # msg_in.start()
+    msg_in = threading.Thread(target=in_msg)
+    msg_in.start()
+    msg_num = 0
     while True:
-        msg=input(">>>")
+        # msg=input(">>>")
         # 发送数据:
-        s.send(base_msg_encode(msg))
-        print(base_msg_decode(s.recv(1024)))
-        if msg =='exit':
-            break
+        if len(list_msg) > msg_num:
+            s.send(base_msg_encode(list_msg[msg_num]))
+            if list_msg[msg_num] =='exit':
+                break
+            msg_num = msg_num + 1
+        else:
+            pass
+        print('\n', base_msg_decode(s.recv(1024)))
     s.send(base_msg_encode('exit'))
     s.close()
 
