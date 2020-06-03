@@ -3,6 +3,10 @@ import threading
 import time
 import base64
 import hashlib
+import requests
+import random
+from random import randint
+
 
 """
 作者:emb
@@ -15,6 +19,19 @@ list_key = []
 list_name = []
 dict_msg = {}
 dict_key = {}
+str_ywz = [' (°ー°〃)', '(#`O′)', '╰(*°▽°*)╯', '(＠_＠;)', '( =•ω•= )m', '(*/ω＼*)', '( ﹁ ﹁ ) ~→']
+
+
+#上传获得消息内容到图灵机器人
+def getMessage(msg):
+    apiURL='http://www.tuling123.com/openapi/api'
+    data={'key':'5a32cecd47d4457fafc61ee5b404c364',
+        'info':msg,
+        'userID':'YG'
+        }
+    r=requests.post(apiURL, data=data).json()
+    ai_msg = f'{str_ywz[random.randint(0,5)]}：'+r.get('text')
+    return ai_msg
 
 
 def key_home(name ,passwd):
