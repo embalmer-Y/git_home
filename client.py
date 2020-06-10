@@ -4,7 +4,7 @@ import hashlib
 import sys
 import time
 import threading
-from progressbar import *
+from progressbar import *, ProgressBar
 
 """
 作者:emb
@@ -73,21 +73,6 @@ def login():
             sys.exit(1)
 
 
-# def out_msg():
-#     global list_msg
-#     while True:
-#         time.sleep(1)
-#         msg_one = base_msg_decode(s.recv(1024))
-#         msg_two = ''
-#         if msg_one.find(msg_two) == -1:
-#             print(msg_one)
-#             msg_two = msg_one
-#         else:
-#             pass
-#         if worning_level0 == 1:
-#             break
-
-
 def in_msg():
     global list_msg ,msg_num
     while True:
@@ -96,16 +81,6 @@ def in_msg():
         if len(list_msg) == 100:
             list_msg.clear()
             msg_num = 0
-
-    # while True:
-    #     msg=input(">>>")
-    #     # 发送数据:
-    #     s.send(base_msg_encode(msg))
-    #     if msg =='exit':
-    #         global worning_level0
-    #         worning_level0 = 1
-    #         break
-
 
 
 if __name__ == "__main__":

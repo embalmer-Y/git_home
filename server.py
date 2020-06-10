@@ -19,6 +19,8 @@ list_key = []
 list_name = []
 dict_msg = {}
 dict_key = {}
+xg_bool = False
+dict_msg_xg = {}
 str_ywz = [' (°ー°〃)', '(#`O′)', '╰(*°▽°*)╯', '(＠_＠;)', '( =•ω•= )m', '(*/ω＼*)', '( ﹁ ﹁ ) ~→']
 
 
@@ -30,8 +32,27 @@ def getMessage(msg):
         'userID':'YG'
         }
     r=requests.post(apiURL, data=data).json()
+    global str_ywz
     ai_msg = f'{str_ywz[random.randint(0,5)]}：'+r.get('text')
     return ai_msg
+
+
+def in_out_xg(passwd):
+    print("已经连接到雪糕，不想聊了就说句‘滚’把")
+    global dict_msg_xg ,dict_msg ,xg_bool
+    xg_bool = True
+    dict_msg_xg.update({passwd:[]})
+    num = len(dict_msg[passwd])
+    index_xg = dict_msg[passwd].index('xg' ,num-3)
+    while True:
+        if len(dict_msg[passwd]) >= index_xg:
+            index_xg = index_xg + 1
+            if dict_msg[passwd][index_xg] == '滚':
+                xg_bool = False
+                break
+            else:
+                dict_msg_xg[passwd].append(getMessage(dict_msg[passwd][index_xg]))
+    dict_msg_xg[passwd].append("哭哭，再见")
 
 
 def key_home(name ,passwd):
@@ -64,7 +85,6 @@ def tuple_list(tuple_key):
     return list_key_in
 
 
-
 def tcplink(sock, addr):
     '''
     接收密钥及分发连接成功信息
@@ -79,13 +99,6 @@ def tcplink(sock, addr):
     time.sleep(1)
     t_in.start()
     msg_out(name ,passwd ,sock)
-    # while True:
-    #     data = sock.recv(1024)
-    #     time.sleep(1)
-    #     if not data or data.decode('utf-8') == 'exit':
-    #         break
-    #     print('Client:%s'%data.decode('utf-8'))
-    #     sock.send(('Server:%s'% input()).encode('utf-8'))
     sock.close()
     global dict_key
     dict_key[passwd].remove(name)
@@ -93,58 +106,22 @@ def tcplink(sock, addr):
 
 
 def msg_out(name ,passwd ,sock):
-    # menu = '''
-    #         menu:
-    #         exit : 退出聊天室
-    #         show : 显示当前聊天室在线人数
-    #         lrs  ：启动狼人杀(完善中)
-    #         xg   ：连接到雪糕(完善中)
-    #         '''
-    # while True:
-    #     msg = base_msg_decode(sock.recv(1024))
-    #     time.sleep(1)
-    #     if not msg or msg == 'exit':
-    #         break
-    #     elif msg == 'menu':
-    #         sock.send(base_msg_encode(menu))
-    #     elif msg == 'lrs':
-    #         pass
-    #     elif msg == 'xg':
-    #         pass
-    #     elif msg == 'show':
-    #         global dict_key
-    #         sock.send(base_msg_encode(dict_key[passwd]))
     msg_num = 0
+    msg_num_xg = 0
     global dict_msg
-#     dict_msg[passwd].append((name ,msg))
     while True:
         for i in dict_msg[passwd][msg_num:]:
-
-        #     if dict_msg[passwd] == []:
-        #         pass
-        #     else:
-        #         if msg_num < len(dict_msg[passwd]):
             if i[0] != name:
                 sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
                 msg_num = msg_num + 1
             else:
                 msg_num = msg_num + 1
-        #     print(msg_num)
-        # if msg_num < len(dict_msg[passwd]):
-        #     if dict_msg[passwd][msg_num][0] != name:
-        #         sock.send(base_msg_encode(f'{dict_msg[passwd][msg_num][0]}:{dict_msg[passwd][msg_num][1]}'))
-        #         msg_num = msg_num + 1
-        #         print(msg_num)
-            # for i in dict_msg[passwd]:
-            #     # if dict_msg[passwd] == []:
-            #     #     pass
-            #     # else:
-            #         if i[0] != name:
-            #             sock.send(base_msg_encode(f'{i[0]}:{i[1]}'))
-            #             msg_num = msg_num + 1
-            #             print(msg_num)
-
-
+        if xg_bool:
+            for j in dict_msg_xg[passwd]:
+                sock.send(base_msg_encode(dict_msg_xg[passwd][msg_num_xg]))
+                msg_num_xg = msg_num_xg + 1
+        else:
+            pass
 
 
 def tcplink_in(name ,passwd ,sock):
@@ -153,7 +130,7 @@ def tcplink_in(name ,passwd ,sock):
             exit : 退出聊天室
             show : 显示当前聊天室在线人数
             lrs  ：启动狼人杀(完善中)
-            xg   ：连接到雪糕(完善中)
+            xg   ：连接到雪糕
             '''
     while True:
         msg = base_msg_decode(sock.recv(1024))
@@ -165,7 +142,8 @@ def tcplink_in(name ,passwd ,sock):
         elif msg == 'lrs':
             pass
         elif msg == 'xg':
-            pass
+            xg_link = threading.Thread(target=in_out_xg, args=(passwd,))
+            xg_link.start()
         elif msg == 'show':
             global dict_key
             sock.send(base_msg_encode(dict_key[passwd]))
