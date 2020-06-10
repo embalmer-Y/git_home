@@ -4,7 +4,7 @@ import hashlib
 import sys
 import time
 import threading
-from progressbar import *, ProgressBar
+from progressbar import *
 
 """
 作者:emb
@@ -73,6 +73,21 @@ def login():
             sys.exit(1)
 
 
+# def out_msg():
+#     global list_msg
+#     while True:
+#         time.sleep(1)
+#         msg_one = base_msg_decode(s.recv(1024))
+#         msg_two = ''
+#         if msg_one.find(msg_two) == -1:
+#             print(msg_one)
+#             msg_two = msg_one
+#         else:
+#             pass
+#         if worning_level0 == 1:
+#             break
+
+
 def in_msg():
     global list_msg ,msg_num
     while True:
@@ -82,6 +97,16 @@ def in_msg():
             list_msg.clear()
             msg_num = 0
 
+    # while True:
+    #     msg=input(">>>")
+    #     # 发送数据:
+    #     s.send(base_msg_encode(msg))
+    #     if msg =='exit':
+    #         global worning_level0
+    #         worning_level0 = 1
+    #         break
+
+
 
 if __name__ == "__main__":
     key = login()
@@ -89,7 +114,7 @@ if __name__ == "__main__":
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # print(type(s))
     # 建立连接:
-    s.connect(('119.3.219.105', 9999))
+    s.connect(('119.3.219.105', 3389))
     #接受连接信息
     print(base_msg_decode(s.recv(1024)))
     # 发送密钥和用户名
